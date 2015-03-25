@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="SquareImagesLayout">
+
+        <attr name="numRows" format="integer" />
+        <attr name="numColumns" format="integer" />
+        <attr name="contentPadding" format="dimension" />
+        <attr name="android:scaleType" />
+
+    </declare-styleable>
+
+    <declare-styleable name="SquareImagesLayoutTheme">
+
+        <attr name="SquareImagesLayoutStyle" format="reference" />
+
+    </declare-styleable>
+
+</resources>
