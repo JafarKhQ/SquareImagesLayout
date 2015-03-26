@@ -2,8 +2,10 @@ package com.epam.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -80,28 +82,49 @@ public class SquareImagesLayout extends ViewGroup {
         }
     }
 
-    public void setNumberOfRows(int numberOfRows) {
+    public void setNumberOfRows(final int numberOfRows) {
         if (numberOfRows < MIN_NUMBER_OF_ROWS) {
             throw new IllegalArgumentException("Number Of Rows ("
                     + numberOfRows
                     + ") cant be less than " + MIN_NUMBER_OF_ROWS);
         }
 
+        if (numberOfRows == mNumberOfRows) {
+            return;
+        }
+
         mNumberOfRows = numberOfRows;
+
+        requestLayout();
+        invalidate();
     }
 
-    public void setNumberOfColumns(int numberOfColumns) {
+    public void setNumberOfColumns(final int numberOfColumns) {
         if (numberOfColumns < MIN_NUMBER_OF_COLUMNS) {
             throw new IllegalArgumentException("Number Of Columns ("
                     + numberOfColumns
                     + ") cant be less than " + MIN_NUMBER_OF_COLUMNS);
         }
 
+        if (numberOfColumns == mNumberOfColumns) {
+            return;
+        }
+
         mNumberOfColumns = numberOfColumns;
+
+        requestLayout();
+        invalidate();
     }
 
-    public void setContentPadding(int contentPadding) {
+    public void setContentPadding(final int contentPadding) {
+        if (contentPadding == mContentPadding) {
+            return;
+        }
+
         mContentPadding = contentPadding;
+
+        requestLayout();
+        invalidate();
     }
 
     public void setScaleType(ImageView.ScaleType scaleType) {
@@ -116,7 +139,7 @@ public class SquareImagesLayout extends ViewGroup {
         }
     }
 
-    public void setImagesResource(int[] resIds) {
+    public void setImages(int[] resIds) {
         if (null == resIds || resIds.length < 1) {
             Log.w(TAG, "setImagesResource: empty array of ids");
             return;
@@ -125,21 +148,46 @@ public class SquareImagesLayout extends ViewGroup {
         final int childCount = getChildCount();
         for (int i = 0; i < childCount && i < resIds.length; i++) {
             ((ImageView) getChildAt(i)).setImageResource(resIds[i]);
-
         }
     }
 
-    private int getRandomBgColor() {
-        Random random = new Random();
-        int r = random.nextInt(256);
-        int g = random.nextInt(256);
-        int b = random.nextInt(256);
-
-        return Color.rgb(r, g, b);
+    public void setImage(int resId, int index) {
+        checkValidImageIndex(index);
+        ((ImageView) getChildAt(index)).setImageResource(resId);
     }
 
-    private void myAddView(View v) {
-        super.addView(v, -1, v.getLayoutParams());
+    public void setImages(Drawable[] drawables) {
+        if (null == drawables || drawables.length < 1) {
+            Log.w(TAG, "setImagesDrawable: empty array of drawables");
+            return;
+        }
+
+        final int childCount = getChildCount();
+        for (int i = 0; i < childCount && i < drawables.length; i++) {
+            ((ImageView) getChildAt(i)).setImageDrawable(drawables[i]);
+        }
+    }
+
+    public void setImage(Drawable drawable, int index) {
+        checkValidImageIndex(index);
+        ((ImageView) getChildAt(index)).setImageDrawable(drawable);
+    }
+
+    public void setImages(Bitmap[] bitmaps) {
+        if (null == bitmaps || bitmaps.length < 1) {
+            Log.w(TAG, "setImagesDrawable: empty array of drawables");
+            return;
+        }
+
+        final int childCount = getChildCount();
+        for (int i = 0; i < childCount && i < bitmaps.length; i++) {
+            ((ImageView) getChildAt(i)).setImageBitmap(bitmaps[i]);
+        }
+    }
+
+    public void setImage(Bitmap bitmap, int index) {
+        checkValidImageIndex(index);
+        ((ImageView) getChildAt(index)).setImageBitmap(bitmap);
     }
 
     @Override
@@ -234,6 +282,32 @@ public class SquareImagesLayout extends ViewGroup {
     @Override
     public void removeAllViews() {
         throw new UnsupportedOperationException("You cant remove or add Views");
+    }
+
+    private int getRandomBgColor() {
+        Random random = new Random();
+        int r = random.nextInt(256);
+        int g = random.nextInt(256);
+        int b = random.nextInt(256);
+
+        return Color.rgb(r, g, b);
+    }
+
+    private void myAddView(View v) {
+        super.addView(v, -1, v.getLayoutParams());
+    }
+
+    private void checkValidImageIndex(int index) {
+        if (false == isValidImageIndex(index)) {
+            throw new IndexOutOfBoundsException("Image index ("
+                    + index
+                    + ") cant exceed the number of Images");
+        }
+    }
+
+    private boolean isValidImageIndex(int index) {
+        int imagesCount = mNumberOfRows * mNumberOfColumns;
+        return (index > 0) && (index < imagesCount);
     }
 
     public static class LayoutParams extends ViewGroup.LayoutParams {
