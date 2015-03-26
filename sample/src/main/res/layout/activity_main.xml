@@ -4,9 +4,12 @@
     android:layout_height="match_parent">
 
     <com.epam.widget.SquareImagesLayout
+        android:id="@+id/sil"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:numColumns="3"
-        app:numRows="4" />
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        app:contentPadding="16dp"
+        app:numColumns="2"
+        app:numRows="2" />
 
 </RelativeLayout>

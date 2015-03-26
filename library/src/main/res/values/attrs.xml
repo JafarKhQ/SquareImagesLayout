@@ -10,10 +10,4 @@
 
     </declare-styleable>
 
-    <declare-styleable name="SquareImagesLayoutTheme">
-
-        <attr name="SquareImagesLayoutStyle" format="reference" />
-
-    </declare-styleable>
-
 </resources>
