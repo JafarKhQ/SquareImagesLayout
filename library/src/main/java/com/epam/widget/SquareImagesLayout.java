@@ -33,6 +33,8 @@ public class SquareImagesLayout extends ViewGroup {
     private int mContentPadding;
     private ImageView.ScaleType mScaleType;
 
+    private boolean mFinishCreating;
+
     public SquareImagesLayout(Context context) {
         this(context, null);
     }
@@ -49,37 +51,26 @@ public class SquareImagesLayout extends ViewGroup {
                 defStyleAttr, 0);
 
         try {
-            setNumberOfRows(a.getInteger(R.styleable.SquareImagesLayout_numRows,
-                    DEFAULT_NUMBER_OF_ROWS));
-            setNumberOfColumns(a.getInteger(R.styleable.SquareImagesLayout_numColumns,
-                    DEFAULT_NUMBER_OF_COLUMNS));
-            setContentPadding(a.getDimensionPixelSize(R.styleable.SquareImagesLayout_contentPadding,
-                    DEFAULT_CONTENT_PADDING));
-
             final int scaleType = a.getInt(R.styleable.SquareImagesLayout_android_scaleType, NONE);
             if (NONE == scaleType || scaleType < 0 || scaleType >= SCALE_TYPES.length) {
                 setScaleType(DEFAULT_SCALE_TYPE);
             } else {
                 setScaleType(SCALE_TYPES[scaleType]);
             }
+
+            setNumberOfRows(a.getInteger(R.styleable.SquareImagesLayout_numRows,
+                    DEFAULT_NUMBER_OF_ROWS));
+            setNumberOfColumns(a.getInteger(R.styleable.SquareImagesLayout_numColumns,
+                    DEFAULT_NUMBER_OF_COLUMNS));
+            setContentPadding(a.getDimensionPixelSize(R.styleable.SquareImagesLayout_contentPadding,
+                    DEFAULT_CONTENT_PADDING));
         } finally {
             a.recycle();
         }
 
-        final int childCount = mNumberOfColumns * mNumberOfRows;
+        mFinishCreating = true;
+        prepareChildViews();
 
-        for (int i = 0; i < childCount; i++) {
-            LayoutParams lp = new LayoutParams();
-            ColorDrawable drawable = new ColorDrawable(getRandomBgColor());
-
-            ImageView imv = new ImageView(getContext());
-            imv.setLayoutParams(lp);
-            imv.setScaleType(mScaleType);
-            imv.setImageDrawable(drawable);
-            imv.setTag(i);
-
-            myAddView(imv);
-        }
     }
 
     public void setNumberOfRows(final int numberOfRows) {
@@ -94,9 +85,11 @@ public class SquareImagesLayout extends ViewGroup {
         }
 
         mNumberOfRows = numberOfRows;
+        prepareChildViews();
+    }
 
-        requestLayout();
-        invalidate();
+    public int getNumberOfRows() {
+        return mNumberOfRows;
     }
 
     public void setNumberOfColumns(final int numberOfColumns) {
@@ -111,9 +104,11 @@ public class SquareImagesLayout extends ViewGroup {
         }
 
         mNumberOfColumns = numberOfColumns;
+        prepareChildViews();
+    }
 
-        requestLayout();
-        invalidate();
+    public int getNumberOfColumns() {
+        return mNumberOfColumns;
     }
 
     public void setContentPadding(final int contentPadding) {
@@ -127,6 +122,10 @@ public class SquareImagesLayout extends ViewGroup {
         invalidate();
     }
 
+    public int getContentPadding() {
+        return mContentPadding;
+    }
+
     public void setScaleType(ImageView.ScaleType scaleType) {
         if (scaleType == null) {
             throw new NullPointerException();
@@ -135,8 +134,15 @@ public class SquareImagesLayout extends ViewGroup {
         if (scaleType != mScaleType) {
             mScaleType = scaleType;
 
-            invalidate();
+            final int childCount = getChildCount();
+            for (int i = 0; i < childCount; i++) {
+                ((ImageView) getChildAt(i)).setScaleType(mScaleType);
+            }
         }
+    }
+
+    public ImageView.ScaleType getScaleType() {
+        return mScaleType;
     }
 
     public void setImages(int[] resIds) {
@@ -284,6 +290,38 @@ public class SquareImagesLayout extends ViewGroup {
         throw new UnsupportedOperationException("You cant remove or add Views");
     }
 
+    private void prepareChildViews() {
+        if (false == mFinishCreating) {
+            return;
+        }
+
+        int oldChildCount = getChildCount();
+        int targetChildCount = mNumberOfColumns * mNumberOfRows;
+
+        if (targetChildCount == oldChildCount) {
+            return;
+        }
+
+        if (oldChildCount > targetChildCount) {
+            while (oldChildCount > targetChildCount) {
+                myRemoveViewAt(--oldChildCount);
+            }
+        } else {
+            while (targetChildCount > oldChildCount) {
+                LayoutParams lp = new LayoutParams();
+                ColorDrawable drawable = new ColorDrawable(getRandomBgColor());
+
+                ImageView imv = new ImageView(getContext());
+                imv.setLayoutParams(lp);
+                imv.setScaleType(mScaleType);
+                imv.setImageDrawable(drawable);
+
+                myAddView(imv);
+                oldChildCount++;
+            }
+        }
+    }
+
     private int getRandomBgColor() {
         Random random = new Random();
         int r = random.nextInt(256);
@@ -295,6 +333,10 @@ public class SquareImagesLayout extends ViewGroup {
 
     private void myAddView(View v) {
         super.addView(v, -1, v.getLayoutParams());
+    }
+
+    private void myRemoveViewAt(int index) {
+        super.removeViewAt(index);
     }
 
     private void checkValidImageIndex(int index) {

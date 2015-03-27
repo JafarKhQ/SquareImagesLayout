@@ -1,16 +1,86 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.epam.widget.SquareImagesLayout
-        android:id="@+id/sil"
-        android:background="#000"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        app:contentPadding="16dp"
-        app:numColumns="2"
-        app:numRows="2" />
+        android:orientation="vertical">
 
-</RelativeLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/ac"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:text="ac" />
+
+            <Button
+                android:id="@+id/rc"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:text="rc" />
+
+            <View
+                android:layout_width="2dp"
+                android:layout_height="50dp"
+                android:background="#f00" />
+
+            <Button
+                android:id="@+id/ar"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:text="ar" />
+
+            <Button
+                android:id="@+id/rr"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:text="rr" />
+
+            <View
+                android:layout_width="2dp"
+                android:layout_height="50dp"
+                android:background="#f00" />
+
+            <Button
+                android:id="@+id/ip"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:text="ip" />
+
+            <Button
+                android:id="@+id/dp"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:text="dp" />
+
+            <View
+                android:layout_width="2dp"
+                android:layout_height="50dp"
+                android:background="#f00" />
+
+            <Button
+                android:id="@+id/st"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:text="st" />
+
+        </LinearLayout>
+
+        <com.epam.widget.SquareImagesLayout
+            android:id="@+id/sil"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#ff2f6b40"
+            android:padding="16dp"
+            app:contentPadding="16dp"
+            app:numColumns="1"
+            app:numRows="1" />
+    </LinearLayout>
+
+</ScrollView>
