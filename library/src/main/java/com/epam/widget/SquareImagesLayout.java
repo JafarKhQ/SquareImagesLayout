@@ -6,12 +6,16 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class SquareImagesLayout extends ViewGroup {
@@ -46,6 +50,8 @@ public class SquareImagesLayout extends ViewGroup {
     public SquareImagesLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
+        setSaveEnabled(true);
+
         final TypedArray a = context.obtainStyledAttributes(attrs,
                 R.styleable.SquareImagesLayout,
                 defStyleAttr, 0);
@@ -70,7 +76,6 @@ public class SquareImagesLayout extends ViewGroup {
 
         mFinishCreating = true;
         prepareChildViews();
-
     }
 
     public void setNumberOfRows(final int numberOfRows) {
@@ -246,6 +251,55 @@ public class SquareImagesLayout extends ViewGroup {
     }
 
     @Override
+    protected void dispatchSaveInstanceState(SparseArray<Parcelable> container) {
+        dispatchFreezeSelfOnly(container);
+    }
+
+    @Override
+    protected void dispatchRestoreInstanceState(SparseArray<Parcelable> container) {
+        dispatchThawSelfOnly(container);
+    }
+
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        Parcelable superState = super.onSaveInstanceState();
+
+        SavedState ss = new SavedState(superState);
+        ss.scaleType = mScaleType;
+        ss.numberOfRows = mNumberOfRows;
+        ss.contentPadding = mContentPadding;
+        ss.numberOfColumns = mNumberOfColumns;
+
+        final int childCount = getChildCount();
+        ss.imagesDrawable = new ArrayList<>(childCount);
+
+        for (int i = 0; i < childCount; i++) {
+            ImageView imv = (ImageView) getChildAt(i);
+            ss.imagesDrawable.add(imv.getDrawable());
+        }
+
+        return ss;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        SavedState ss = (SavedState) state;
+        super.onRestoreInstanceState(ss.getSuperState());
+
+        setScaleType(ss.scaleType);
+        mNumberOfRows = ss.numberOfRows;
+        mContentPadding = ss.contentPadding;
+        mNumberOfColumns = ss.numberOfColumns;
+
+        prepareChildViews();
+        final int childCount = getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            ImageView imv = (ImageView) getChildAt(i);
+            imv.setImageDrawable(ss.imagesDrawable.get(i));
+        }
+    }
+
+    @Override
     public void addView(View child) {
         throw new UnsupportedOperationException("You cant remove or add Views");
     }
@@ -302,23 +356,23 @@ public class SquareImagesLayout extends ViewGroup {
             return;
         }
 
-        if (oldChildCount > targetChildCount) {
-            while (oldChildCount > targetChildCount) {
-                myRemoveViewAt(--oldChildCount);
-            }
-        } else {
-            while (targetChildCount > oldChildCount) {
-                LayoutParams lp = new LayoutParams();
-                ColorDrawable drawable = new ColorDrawable(getRandomBgColor());
+        // remove children
+        while (oldChildCount > targetChildCount) {
+            myRemoveViewAt(--oldChildCount);
+        }
 
-                ImageView imv = new ImageView(getContext());
-                imv.setLayoutParams(lp);
-                imv.setScaleType(mScaleType);
-                imv.setImageDrawable(drawable);
+        // add children
+        while (oldChildCount < targetChildCount) {
+            LayoutParams lp = new LayoutParams();
+            ColorDrawable drawable = new ColorDrawable(getRandomBgColor());
 
-                myAddView(imv);
-                oldChildCount++;
-            }
+            ImageView imv = new ImageView(getContext());
+            imv.setLayoutParams(lp);
+            imv.setScaleType(mScaleType);
+            imv.setImageDrawable(drawable);
+
+            myAddView(imv);
+            oldChildCount++;
         }
     }
 
@@ -363,6 +417,24 @@ public class SquareImagesLayout extends ViewGroup {
 
         public LayoutParams(int width, int height) {
             super(width, height);
+        }
+    }
+
+    private static class SavedState extends BaseSavedState {
+
+        int numberOfRows;
+        int numberOfColumns;
+        int contentPadding;
+        ImageView.ScaleType scaleType;
+
+        ArrayList<Drawable> imagesDrawable;
+
+        public SavedState(Parcel source) {
+            super(source);
+        }
+
+        public SavedState(Parcelable superState) {
+            super(superState);
         }
     }
 }
