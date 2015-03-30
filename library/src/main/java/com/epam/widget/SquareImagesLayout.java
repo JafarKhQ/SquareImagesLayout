@@ -32,6 +32,7 @@ public class SquareImagesLayout extends ViewGroup {
     private static final int DEFAULT_NUMBER_OF_COLUMNS = 1;
     private static final ImageView.ScaleType DEFAULT_SCALE_TYPE = ImageView.ScaleType.CENTER_CROP;
 
+    private int mImageSize;
     private int mNumberOfRows;
     private int mNumberOfColumns;
     private int mContentPadding;
@@ -76,6 +77,10 @@ public class SquareImagesLayout extends ViewGroup {
 
         mFinishCreating = true;
         prepareChildViews();
+    }
+
+    public int getImageSize() {
+        return mImageSize;
     }
 
     public void setNumberOfRows(final int numberOfRows) {
@@ -141,7 +146,7 @@ public class SquareImagesLayout extends ViewGroup {
 
             final int childCount = getChildCount();
             for (int i = 0; i < childCount; i++) {
-                ((ImageView) getChildAt(i)).setScaleType(mScaleType);
+                getChildAt(i).setScaleType(mScaleType);
             }
         }
     }
@@ -158,13 +163,13 @@ public class SquareImagesLayout extends ViewGroup {
 
         final int childCount = getChildCount();
         for (int i = 0; i < childCount && i < resIds.length; i++) {
-            ((ImageView) getChildAt(i)).setImageResource(resIds[i]);
+            getChildAt(i).setImageResource(resIds[i]);
         }
     }
 
     public void setImage(int resId, int index) {
         checkValidImageIndex(index);
-        ((ImageView) getChildAt(index)).setImageResource(resId);
+        getChildAt(index).setImageResource(resId);
     }
 
     public void setImages(Drawable[] drawables) {
@@ -175,13 +180,13 @@ public class SquareImagesLayout extends ViewGroup {
 
         final int childCount = getChildCount();
         for (int i = 0; i < childCount && i < drawables.length; i++) {
-            ((ImageView) getChildAt(i)).setImageDrawable(drawables[i]);
+            getChildAt(i).setImageDrawable(drawables[i]);
         }
     }
 
     public void setImage(Drawable drawable, int index) {
         checkValidImageIndex(index);
-        ((ImageView) getChildAt(index)).setImageDrawable(drawable);
+        getChildAt(index).setImageDrawable(drawable);
     }
 
     public void setImages(Bitmap[] bitmaps) {
@@ -192,13 +197,18 @@ public class SquareImagesLayout extends ViewGroup {
 
         final int childCount = getChildCount();
         for (int i = 0; i < childCount && i < bitmaps.length; i++) {
-            ((ImageView) getChildAt(i)).setImageBitmap(bitmaps[i]);
+            getChildAt(i).setImageBitmap(bitmaps[i]);
         }
     }
 
     public void setImage(Bitmap bitmap, int index) {
         checkValidImageIndex(index);
-        ((ImageView) getChildAt(index)).setImageBitmap(bitmap);
+        getChildAt(index).setImageBitmap(bitmap);
+    }
+
+    @Override
+    public ImageView getChildAt(int index) {
+        return (ImageView) super.getChildAt(index);
     }
 
     @Override
@@ -215,8 +225,8 @@ public class SquareImagesLayout extends ViewGroup {
         final int totalHorizontalContentPadding = mContentPadding * (mNumberOfColumns - 1);
         final int totalVerticalContentPadding = mContentPadding * (mNumberOfRows - 1);
 
-        final int imageViewSize = (availableContentWidth - totalHorizontalContentPadding) / mNumberOfColumns;
-        final int layoutHeight = (imageViewSize * mNumberOfRows)
+        mImageSize = (availableContentWidth - totalHorizontalContentPadding) / mNumberOfColumns;
+        final int layoutHeight = (mImageSize * mNumberOfRows)
                 + getPaddingTop() + getPaddingBottom()
                 + totalVerticalContentPadding;
 
@@ -228,12 +238,12 @@ public class SquareImagesLayout extends ViewGroup {
             int colIndex = currentChild % mNumberOfColumns;
             int rowIndex = currentChild / mNumberOfColumns;
 
-            lp.x = (colIndex * imageViewSize) + (colIndex * mContentPadding) + getPaddingLeft();
-            lp.y = (rowIndex * imageViewSize) + (rowIndex * mContentPadding) + getPaddingTop();
-            lp.width = lp.height = imageViewSize;
+            lp.x = (colIndex * mImageSize) + (colIndex * mContentPadding) + getPaddingLeft();
+            lp.y = (rowIndex * mImageSize) + (rowIndex * mContentPadding) + getPaddingTop();
+            lp.width = lp.height = mImageSize;
 
-            v.measure(MeasureSpec.makeMeasureSpec(imageViewSize, MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(imageViewSize, MeasureSpec.EXACTLY));
+            v.measure(MeasureSpec.makeMeasureSpec(mImageSize, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(mImageSize, MeasureSpec.EXACTLY));
         }
 
         setMeasuredDimension(sizeWidth,
@@ -274,7 +284,7 @@ public class SquareImagesLayout extends ViewGroup {
         ss.imagesDrawable = new ArrayList<>(childCount);
 
         for (int i = 0; i < childCount; i++) {
-            ImageView imv = (ImageView) getChildAt(i);
+            ImageView imv = getChildAt(i);
             ss.imagesDrawable.add(imv.getDrawable());
         }
 
@@ -294,7 +304,7 @@ public class SquareImagesLayout extends ViewGroup {
         prepareChildViews();
         final int childCount = getChildCount();
         for (int i = 0; i < childCount; i++) {
-            ImageView imv = (ImageView) getChildAt(i);
+            ImageView imv = getChildAt(i);
             imv.setImageDrawable(ss.imagesDrawable.get(i));
         }
     }

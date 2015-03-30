@@ -1,16 +1,17 @@
-package com.epam.sample;
+package com.epam.sample.activitys;
 
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.epam.sample.R;
+import com.epam.sample.activitys.BaseActivity;
 import com.epam.widget.SquareImagesLayout;
 
 import java.util.Random;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends BaseActivity {
 
     SquareImagesLayout s;
     final static int[] a =
@@ -22,10 +23,13 @@ public class MainActivity extends ActionBarActivity {
             };
 
     @Override
+    protected int getLayoutResId() {
+        return R.layout.activity_main;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
 
         s = (SquareImagesLayout) findViewById(R.id.sil);
         s.setImages(a);
