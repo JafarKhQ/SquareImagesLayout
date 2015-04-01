@@ -1,7 +1,9 @@
 package com.epam.sample.adapters;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,18 +12,21 @@ import android.widget.TextView;
 import com.epam.sample.R;
 import com.epam.sample.models.DayImages;
 import com.epam.widget.SquareImagesLayout;
-import com.squareup.picasso.Picasso;
+import com.epam.widget.SquareImagesView;
 
 import java.util.ArrayList;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.Optional;
 
 public class GalleryListAdapter extends RecyclerView.Adapter<GalleryListAdapter.ViewHolder> {
 
     private Context mContext;
     private LayoutInflater mInflater;
     private ArrayList<DayImages> mDaysImages;
+
+    private static final boolean USE_LAYOUT = false;
 
     public GalleryListAdapter(Context context) {
         mContext = context;
@@ -48,7 +53,13 @@ public class GalleryListAdapter extends RecyclerView.Adapter<GalleryListAdapter.
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        View v = mInflater.inflate(R.layout.list_item_gallery_list, viewGroup, false);
+        View v;
+        if (USE_LAYOUT) {
+            v = mInflater.inflate(R.layout.list_item_gallery_list_layout, viewGroup, false);
+        } else {
+            v = mInflater.inflate(R.layout.list_item_gallery_list_view, viewGroup, false);
+        }
+
         return new ViewHolder(v);
     }
 
@@ -62,15 +73,22 @@ public class GalleryListAdapter extends RecyclerView.Adapter<GalleryListAdapter.
 
         viewHolder.txvTitle.setText(dayImages.getDayDate());
 
-        viewHolder.silImages.setNumberOfRows(rowNum);
-        viewHolder.silImages.setNumberOfColumns(colNum);
+        if (null != viewHolder.silImages) {
+            viewHolder.silImages.setNumberOfRows(rowNum);
+            viewHolder.silImages.setNumberOfColumns(colNum);
+        } else {
+            viewHolder.sivImages.setNumberOfRows(rowNum);
+            viewHolder.sivImages.setNumberOfColumns(colNum);
+        }
 
-        for (int x = 0; x < imagesNum && x < viewHolder.silImages.getChildCount(); x++) {
-            //Picasso.with(mContext)
-                   // .load(dayImages.getUriAt(x))
-                            //.resize(viewHolder.silImages.getImageSize(), viewHolder.silImages.getImageSize())
-                  //  .into(viewHolder.silImages.getChildAt(x));
-            viewHolder.silImages.getChildAt(x).setImageURI(dayImages.getUriAt(x));
+        if (null != viewHolder.silImages) {
+            for (int x = 0; x < imagesNum && x < viewHolder.silImages.getChildCount(); x++) {
+                viewHolder.silImages.getChildAt(x).setImageURI(dayImages.getUriAt(x));
+            }
+        } else {
+            Uri[] array = new Uri[imagesNum];
+            dayImages.getUris().toArray(array);
+            viewHolder.sivImages.addImage(array);
         }
     }
 
@@ -78,8 +96,12 @@ public class GalleryListAdapter extends RecyclerView.Adapter<GalleryListAdapter.
 
         @InjectView(R.id.gallery_list_txv_title)
         TextView txvTitle;
+        @Optional
         @InjectView(R.id.gallery_list_sil_images)
         SquareImagesLayout silImages;
+        @Optional
+        @InjectView(R.id.gallery_list_siv_images)
+        SquareImagesView sivImages;
 
         public ViewHolder(View itemView) {
             super(itemView);

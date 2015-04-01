@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <attr name="numRows" format="integer" />
+    <attr name="numColumns" format="integer" />
+    <attr name="contentPadding" format="dimension" />
+
+    <declare-styleable name="SquareImagesView">
+
+        <attr name="numRows" />
+        <attr name="numColumns" />
+        <attr name="contentPadding" />
+
+    </declare-styleable>
+
     <declare-styleable name="SquareImagesLayout">
 
-        <attr name="numRows" format="integer" />
-        <attr name="numColumns" format="integer" />
-        <attr name="contentPadding" format="dimension" />
+        <attr name="numRows" />
+        <attr name="numColumns" />
+        <attr name="contentPadding" />
         <attr name="android:scaleType" />
 
     </declare-styleable>
