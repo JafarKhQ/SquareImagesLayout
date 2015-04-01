@@ -176,6 +176,13 @@ public class SquareImagesView extends View {
         addImageInternal(uris[i], true);
     }
 
+    public void clearImages(boolean invalidate) {
+        mDrawables.clear();
+        if (invalidate) {
+            invalidate();
+        }
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         final int sizeWidth = MeasureSpec.getSize(widthMeasureSpec);

@@ -3,7 +3,6 @@ package com.epam.sample.adapters;
 import android.content.Context;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -86,6 +85,8 @@ public class GalleryListAdapter extends RecyclerView.Adapter<GalleryListAdapter.
                 viewHolder.silImages.getChildAt(x).setImageURI(dayImages.getUriAt(x));
             }
         } else {
+            viewHolder.sivImages.clearImages(false);
+
             Uri[] array = new Uri[imagesNum];
             dayImages.getUris().toArray(array);
             viewHolder.sivImages.addImage(array);
