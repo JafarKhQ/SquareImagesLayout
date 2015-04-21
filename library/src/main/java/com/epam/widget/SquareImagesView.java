@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -16,7 +17,7 @@ import android.view.View;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.ref.WeakReference;
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -38,7 +39,11 @@ public class SquareImagesView extends View {
     private int mContentPadding;
 
     private Paint mPaint;
-    private ArrayList<WeakReference<Drawable>> mDrawables;
+
+    private Path mPathNull;
+    private Paint mPaintNullFG;
+    private Paint mPaintNullBG;
+    private ArrayList<SoftReference<Drawable>> mDrawables;
 
     public SquareImagesView(Context context) {
         this(context, null);
@@ -68,6 +73,17 @@ public class SquareImagesView extends View {
 
         mPaint = new Paint();
         mPaint.setStyle(Paint.Style.FILL);
+
+        mPaintNullFG = new Paint();
+        mPaintNullFG.setStyle(Paint.Style.STROKE);
+        mPaintNullFG.setColor(Color.BLACK);
+        mPaintNullFG.setStrokeWidth(20.0f);
+
+        mPaintNullBG = new Paint(mPaint);
+        mPaintNullBG.setColor(Color.WHITE);
+
+        mPathNull = new Path();
+
         mDrawables = new ArrayList<>(getMaxImagesNumber());
     }
 
@@ -87,7 +103,6 @@ public class SquareImagesView extends View {
         }
 
         mNumberOfRows = numberOfRows;
-        //todo
         requestLayout();
         invalidate();
     }
@@ -108,7 +123,6 @@ public class SquareImagesView extends View {
         }
 
         mNumberOfColumns = numberOfColumns;
-        //todo
         requestLayout();
         invalidate();
     }
@@ -123,7 +137,6 @@ public class SquareImagesView extends View {
         }
 
         mContentPadding = contentPadding;
-        //todo
         requestLayout();
         invalidate();
     }
@@ -141,6 +154,11 @@ public class SquareImagesView extends View {
     }
 
     public void addImage(Drawable... drawables) {
+        if (null == drawables) {
+            Log.w(TAG, "addImage: null drawable");
+            return;
+        }
+
         int i = 0;
         for (; i < drawables.length - 1; i++) {
             addImageInternal(drawables[i], false);
@@ -150,6 +168,11 @@ public class SquareImagesView extends View {
     }
 
     public void addImage(Bitmap... bitmaps) {
+        if (null == bitmaps) {
+            Log.w(TAG, "addImage: null bitmap");
+            return;
+        }
+
         int i = 0;
         for (; i < bitmaps.length - 1; i++) {
             addImageInternal(bitmaps[i], false);
@@ -159,6 +182,11 @@ public class SquareImagesView extends View {
     }
 
     public void addImage(int... resIds) {
+        if (null == resIds) {
+            Log.w(TAG, "addImage: null resId");
+            return;
+        }
+
         int i = 0;
         for (; i < resIds.length - 1; i++) {
             addImageInternal(resIds[i], false);
@@ -168,6 +196,11 @@ public class SquareImagesView extends View {
     }
 
     public void addImage(Uri... uris) {
+        if (null == uris) {
+            Log.w(TAG, "addImage: null uri");
+            return;
+        }
+
         int i = 0;
         for (; i < uris.length - 1; i++) {
             addImageInternal(uris[i], false);
@@ -176,8 +209,13 @@ public class SquareImagesView extends View {
         addImageInternal(uris[i], true);
     }
 
+    public void clearImages() {
+        clearImages(true);
+    }
+
     public void clearImages(boolean invalidate) {
         mDrawables.clear();
+
         if (invalidate) {
             invalidate();
         }
@@ -220,7 +258,7 @@ public class SquareImagesView extends View {
                 drawDrawable(d, canvas, i);
             } else {
                 Log.w(TAG, "Image number " + i + " is NULL");
-                drawRandomColor(canvas, i);
+                drawNullImage(canvas, i);
             }
         }
 
@@ -243,6 +281,23 @@ public class SquareImagesView extends View {
 
     private void drawRandomColor(Canvas canvas, int position) {
         drawColor(getRandomBgColor(), canvas, position);
+    }
+
+    private void drawNullImage(Canvas canvas, int position) {
+        int colIndex = position % mNumberOfColumns;
+        int rowIndex = position / mNumberOfColumns;
+
+        int x = (colIndex * mImageSize) + (colIndex * mContentPadding) + getPaddingLeft();
+        int y = (rowIndex * mImageSize) + (rowIndex * mContentPadding) + getPaddingTop();
+
+        mPathNull.reset();
+        mPathNull.moveTo(x, y);
+        mPathNull.lineTo(x + mImageSize, y + mImageSize);
+        mPathNull.moveTo(x + mImageSize, y);
+        mPathNull.lineTo(x, y + mImageSize);
+
+        canvas.drawRect(x, y, x + mImageSize, y + mImageSize, mPaintNullBG);
+        canvas.drawPath(mPathNull, mPaintNullFG);
     }
 
     private void drawColor(int color, Canvas canvas, int position) {
@@ -268,9 +323,10 @@ public class SquareImagesView extends View {
     private void addImageInternal(Uri uri, boolean invalidate) {
         Drawable d = null;
         String scheme = uri.getScheme();
+
         if (ContentResolver.SCHEME_ANDROID_RESOURCE.equals(scheme)) {
-            //todo
             // Load drawable through Resources, to get the source density information
+            throw new UnsupportedOperationException("Resource URI not supported");
         } else if (ContentResolver.SCHEME_CONTENT.equals(scheme)
                 || ContentResolver.SCHEME_FILE.equals(scheme)) {
             InputStream stream = null;
@@ -295,7 +351,7 @@ public class SquareImagesView extends View {
     }
 
     private void addImageInternal(Drawable drawable, boolean invalidate) {
-        mDrawables.add(new WeakReference<>(drawable));
+        mDrawables.add(new SoftReference<>(drawable));
 
         if (invalidate) {
             invalidate();

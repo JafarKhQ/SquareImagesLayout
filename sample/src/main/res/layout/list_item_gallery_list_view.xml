@@ -17,7 +17,7 @@
         android:textSize="16sp"
         tools:text="Title" />
 
-    <com.epam.widget.SquareImagesView
+    <com.epam.sample.widget.MySquareImagesView
         android:id="@+id/gallery_list_siv_images"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

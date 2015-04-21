@@ -1,7 +1,6 @@
 package com.epam.sample.adapters;
 
 import android.content.Context;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,8 +9,9 @@ import android.widget.TextView;
 
 import com.epam.sample.R;
 import com.epam.sample.models.DayImages;
+import com.epam.sample.widget.MySquareImagesView;
 import com.epam.widget.SquareImagesLayout;
-import com.epam.widget.SquareImagesView;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -21,6 +21,7 @@ import butterknife.Optional;
 
 public class GalleryListAdapter extends RecyclerView.Adapter<GalleryListAdapter.ViewHolder> {
 
+    private int mScreenWidth;
     private Context mContext;
     private LayoutInflater mInflater;
     private ArrayList<DayImages> mDaysImages;
@@ -30,6 +31,9 @@ public class GalleryListAdapter extends RecyclerView.Adapter<GalleryListAdapter.
     public GalleryListAdapter(Context context) {
         mContext = context;
         mInflater = LayoutInflater.from(context);
+        mScreenWidth = context.getResources().getDisplayMetrics().widthPixels;
+
+        Picasso.with(mContext).setLoggingEnabled(true);
     }
 
     public void setList(ArrayList<DayImages> mergeCursor) {
@@ -68,28 +72,39 @@ public class GalleryListAdapter extends RecyclerView.Adapter<GalleryListAdapter.
         int imagesNum = dayImages.getUriCount();
 
         int colNum = (int) Math.ceil(Math.sqrt(imagesNum));
-        int rowNum = (int) Math.ceil(Math.sqrt(imagesNum));
+        int rowNum = (int) Math.floor(Math.sqrt(imagesNum));
+        while (colNum * rowNum < imagesNum) {
+            rowNum++;
+        }
 
-        viewHolder.txvTitle.setText(dayImages.getDayDate());
+        viewHolder.txvTitle.setText(dayImages.getDayDate() + " - (" + imagesNum + ")");
 
         if (null != viewHolder.silImages) {
             viewHolder.silImages.setNumberOfRows(rowNum);
             viewHolder.silImages.setNumberOfColumns(colNum);
-        } else {
-            viewHolder.sivImages.setNumberOfRows(rowNum);
-            viewHolder.sivImages.setNumberOfColumns(colNum);
-        }
 
-        if (null != viewHolder.silImages) {
             for (int x = 0; x < imagesNum && x < viewHolder.silImages.getChildCount(); x++) {
                 viewHolder.silImages.getChildAt(x).setImageURI(dayImages.getUriAt(x));
             }
         } else {
-            viewHolder.sivImages.clearImages(false);
+            viewHolder.sivImages.setTag(i);
+            viewHolder.sivImages.clearImages();
 
-            Uri[] array = new Uri[imagesNum];
-            dayImages.getUris().toArray(array);
-            viewHolder.sivImages.addImage(array);
+            viewHolder.sivImages.setNumberOfRows(rowNum);
+            viewHolder.sivImages.setNumberOfColumns(colNum);
+
+            int contentPadding = viewHolder.sivImages.getContentPadding() * (colNum - 1);
+            int viewPadding = viewHolder.sivImages.getPaddingLeft() + viewHolder.sivImages.getPaddingRight();
+            int availableWidth = mScreenWidth - (contentPadding + viewPadding);
+            int imageSize = availableWidth / colNum;
+
+            for (int k = 0; k < dayImages.getUriCount(); k++) {
+                Picasso.with(mContext)
+                        .load("file://" + dayImages.getUriAt(k).toString())
+                        .resize(imageSize, imageSize)
+                        .centerCrop()
+                        .into(viewHolder.sivImages);
+            }
         }
     }
 
@@ -102,7 +117,7 @@ public class GalleryListAdapter extends RecyclerView.Adapter<GalleryListAdapter.
         SquareImagesLayout silImages;
         @Optional
         @InjectView(R.id.gallery_list_siv_images)
-        SquareImagesView sivImages;
+        MySquareImagesView sivImages;
 
         public ViewHolder(View itemView) {
             super(itemView);
