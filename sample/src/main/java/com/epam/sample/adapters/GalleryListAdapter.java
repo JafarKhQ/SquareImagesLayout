@@ -26,14 +26,14 @@ public class GalleryListAdapter extends RecyclerView.Adapter<GalleryListAdapter.
     private LayoutInflater mInflater;
     private ArrayList<DayImages> mDaysImages;
 
-    private static final boolean USE_LAYOUT = true;
+    private static final boolean USE_LAYOUT = false;
 
     public GalleryListAdapter(Context context) {
         mContext = context;
         mInflater = LayoutInflater.from(context);
         mScreenWidth = context.getResources().getDisplayMetrics().widthPixels;
 
-//        Picasso.with(mContext).setLoggingEnabled(true);
+        // Picasso.with(mContext).setLoggingEnabled(true);
     }
 
     public void setList(ArrayList<DayImages> mergeCursor) {
