@@ -26,14 +26,14 @@ public class GalleryListAdapter extends RecyclerView.Adapter<GalleryListAdapter.
     private LayoutInflater mInflater;
     private ArrayList<DayImages> mDaysImages;
 
-    private static final boolean USE_LAYOUT = false;
+    private static final boolean USE_LAYOUT = true;
 
     public GalleryListAdapter(Context context) {
         mContext = context;
         mInflater = LayoutInflater.from(context);
         mScreenWidth = context.getResources().getDisplayMetrics().widthPixels;
 
-        Picasso.with(mContext).setLoggingEnabled(true);
+//        Picasso.with(mContext).setLoggingEnabled(true);
     }
 
     public void setList(ArrayList<DayImages> mergeCursor) {
@@ -83,12 +83,21 @@ public class GalleryListAdapter extends RecyclerView.Adapter<GalleryListAdapter.
             viewHolder.silImages.setNumberOfRows(rowNum);
             viewHolder.silImages.setNumberOfColumns(colNum);
 
-            for (int x = 0; x < imagesNum && x < viewHolder.silImages.getChildCount(); x++) {
-                viewHolder.silImages.getChildAt(x).setImageURI(dayImages.getUriAt(x));
+            int contentPadding = viewHolder.silImages.getContentPadding() * (colNum - 1);
+            int viewPadding = viewHolder.silImages.getPaddingLeft() + viewHolder.silImages.getPaddingRight();
+            int availableWidth = mScreenWidth - (contentPadding + viewPadding);
+            int imageSize = availableWidth / colNum;
+
+            for (int k = 0; k < imagesNum && k < viewHolder.silImages.getChildCount(); k++) {
+                Picasso.with(mContext)
+                        .load("file://" + dayImages.getUriAt(k).toString())
+                        .resize(imageSize, imageSize)
+                        .centerCrop()
+                        .into(viewHolder.silImages.getChildAt(k));
             }
         } else {
             viewHolder.sivImages.setTag(i);
-            viewHolder.sivImages.clearImages();
+            viewHolder.sivImages.clearImages(false);
 
             viewHolder.sivImages.setNumberOfRows(rowNum);
             viewHolder.sivImages.setNumberOfColumns(colNum);

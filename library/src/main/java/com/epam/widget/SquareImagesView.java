@@ -21,7 +21,7 @@ import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class SquareImagesView extends View {
+public class SquareImagesView extends View implements SquareImages {
     private static final String TAG = "SquareImagesView";
 
     private static final int NONE = Integer.MIN_VALUE;
@@ -87,10 +87,12 @@ public class SquareImagesView extends View {
         mDrawables = new ArrayList<>(getMaxImagesNumber());
     }
 
+    @Override
     public int getImageSize() {
         return mImageSize;
     }
 
+    @Override
     public void setNumberOfRows(final int numberOfRows) {
         if (numberOfRows < MIN_NUMBER_OF_ROWS) {
             throw new IllegalArgumentException("Number Of Rows ("
@@ -107,10 +109,12 @@ public class SquareImagesView extends View {
         invalidate();
     }
 
+    @Override
     public int getNumberOfRows() {
         return mNumberOfRows;
     }
 
+    @Override
     public void setNumberOfColumns(final int numberOfColumns) {
         if (numberOfColumns < MIN_NUMBER_OF_COLUMNS) {
             throw new IllegalArgumentException("Number Of Columns ("
@@ -127,10 +131,12 @@ public class SquareImagesView extends View {
         invalidate();
     }
 
+    @Override
     public int getNumberOfColumns() {
         return mNumberOfColumns;
     }
 
+    @Override
     public void setContentPadding(final int contentPadding) {
         if (contentPadding == mContentPadding) {
             return;
@@ -141,6 +147,7 @@ public class SquareImagesView extends View {
         invalidate();
     }
 
+    @Override
     public int getContentPadding() {
         return mContentPadding;
     }

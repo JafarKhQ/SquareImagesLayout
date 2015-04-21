@@ -18,7 +18,7 @@ import android.widget.ImageView;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class SquareImagesLayout extends ViewGroup {
+public class SquareImagesLayout extends ViewGroup implements SquareImages {
     private static final String TAG = "SquareImagesLayout";
 
     private static final int NONE = Integer.MIN_VALUE;
@@ -79,10 +79,12 @@ public class SquareImagesLayout extends ViewGroup {
         prepareChildViews();
     }
 
+    @Override
     public int getImageSize() {
         return mImageSize;
     }
 
+    @Override
     public void setNumberOfRows(final int numberOfRows) {
         if (numberOfRows < MIN_NUMBER_OF_ROWS) {
             throw new IllegalArgumentException("Number Of Rows ("
@@ -98,10 +100,12 @@ public class SquareImagesLayout extends ViewGroup {
         prepareChildViews();
     }
 
+    @Override
     public int getNumberOfRows() {
         return mNumberOfRows;
     }
 
+    @Override
     public void setNumberOfColumns(final int numberOfColumns) {
         if (numberOfColumns < MIN_NUMBER_OF_COLUMNS) {
             throw new IllegalArgumentException("Number Of Columns ("
@@ -117,10 +121,12 @@ public class SquareImagesLayout extends ViewGroup {
         prepareChildViews();
     }
 
+    @Override
     public int getNumberOfColumns() {
         return mNumberOfColumns;
     }
 
+    @Override
     public void setContentPadding(final int contentPadding) {
         if (contentPadding == mContentPadding) {
             return;
@@ -132,6 +138,7 @@ public class SquareImagesLayout extends ViewGroup {
         invalidate();
     }
 
+    @Override
     public int getContentPadding() {
         return mContentPadding;
     }
