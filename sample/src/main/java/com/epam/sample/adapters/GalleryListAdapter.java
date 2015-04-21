@@ -26,7 +26,8 @@ public class GalleryListAdapter extends RecyclerView.Adapter<GalleryListAdapter.
     private LayoutInflater mInflater;
     private ArrayList<DayImages> mDaysImages;
 
-    private static final boolean USE_LAYOUT = false;
+    private static final int VIEW_TYPE_VIEW = 0;
+    private static final int VIEW_TYPE_LAYOUT = 1;
 
     public GalleryListAdapter(Context context) {
         mContext = context;
@@ -36,12 +37,12 @@ public class GalleryListAdapter extends RecyclerView.Adapter<GalleryListAdapter.
         // Picasso.with(mContext).setLoggingEnabled(true);
     }
 
-    public void setList(ArrayList<DayImages> mergeCursor) {
-        if (mergeCursor == mDaysImages) {
+    public void setList(ArrayList<DayImages> dayImages) {
+        if (dayImages == mDaysImages) {
             return;
         }
 
-        mDaysImages = mergeCursor;
+        mDaysImages = dayImages;
         notifyDataSetChanged();
     }
 
@@ -55,20 +56,34 @@ public class GalleryListAdapter extends RecyclerView.Adapter<GalleryListAdapter.
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public int getItemViewType(int position) {
+        return VIEW_TYPE_VIEW;
+    }
+
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int position) {
         View v;
-        if (USE_LAYOUT) {
-            v = mInflater.inflate(R.layout.list_item_gallery_list_layout, viewGroup, false);
-        } else {
-            v = mInflater.inflate(R.layout.list_item_gallery_list_view, viewGroup, false);
+        switch (getItemViewType(position)) {
+            case VIEW_TYPE_VIEW:
+                v = mInflater.inflate(R.layout.list_item_gallery_list_view, viewGroup, false);
+                break;
+
+            case VIEW_TYPE_LAYOUT:
+                v = mInflater.inflate(R.layout.list_item_gallery_list_layout, viewGroup, false);
+                break;
+
+            default:
+                throw new IllegalArgumentException("Invalid View Type ("
+                        + getItemViewType(position)
+                        + ") at " + position);
         }
 
         return new ViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder viewHolder, int i) {
-        final DayImages dayImages = mDaysImages.get(i);
+    public void onBindViewHolder(ViewHolder viewHolder, int position) {
+        final DayImages dayImages = mDaysImages.get(position);
         int imagesNum = dayImages.getUriCount();
 
         int colNum = (int) Math.ceil(Math.sqrt(imagesNum));
@@ -96,7 +111,7 @@ public class GalleryListAdapter extends RecyclerView.Adapter<GalleryListAdapter.
                         .into(viewHolder.silImages.getChildAt(k));
             }
         } else {
-            viewHolder.sivImages.setTag(i);
+            viewHolder.sivImages.setTag(position);
             viewHolder.sivImages.clearImages(false);
 
             viewHolder.sivImages.setNumberOfRows(rowNum);
